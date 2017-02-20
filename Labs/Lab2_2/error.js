@@ -1,3 +1,4 @@
+const database = require('./database')();
 
 module.exports.verifyRequiredJudge =function(request){
     var errors = true;
@@ -83,6 +84,16 @@ module.exports.verifyRequiredCase =function(request){
     if (request.query.duration == "" ) {
         errors = false;
     }
+
+    database.Case.findAll({
+                        where: {
+                            courtroom_id: request.query.courtroom_id
+                        }
+    }).then(function(contacts) {
+        if ( contacts.count > 0 ) {
+            errors = false
+        }
+    });
 
     if (errors) {
         error_messages = {
