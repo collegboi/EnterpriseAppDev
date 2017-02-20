@@ -6,8 +6,8 @@ var app = express()
 app.get('/users', function (req, res) {
 	//res.send('Hello World!')
 	
-	db.run("select * from users", function(err, res){
-		console.log(res);
+	db.run("select * from users", function(err, result){
+		res.send(result);
 	});
 })
 
@@ -16,16 +16,16 @@ app.get('/users/:id', function (req, res) {
 	
 	var id = req.params.id
 	
-	db.run("select * from users where id = $1", [id], function(err, res){
-		console.log(res);
+	db.run("select * from users where id = $1", [id], function(err, result){
+		res.send(result);
 	});
 })
 
 app.get('/products', function (req, res) {
 	//res.send('Hello World!')
 	
-	db.run("select * from products", function(err, res){
-		console.log(res);
+	db.run("select * from products", function(err, result){
+		res.send(result);
 	});
 })
 
@@ -34,8 +34,8 @@ app.get('/products/:id', function (req, res) {
 	
 	var id = req.params.id
 	
-	db.run("select * from products where id = $1", [id], function(err, res){
-		console.log(res);
+	db.run("select * from products where id = $1", [id], function(err, result){
+		res.send(result);
 	});
 })
 
@@ -50,8 +50,8 @@ app.get('/purchases/:id', function (req, res) {
 	
 	var id = req.params.id
 	
-	db.run("select * from purchases where id = $1", [id], function(err, res){
-		console.log(res);
+	db.run("select * from purchases where id = $1", [id], function(err, result){
+		res.send(result);
 	});
 })
 
