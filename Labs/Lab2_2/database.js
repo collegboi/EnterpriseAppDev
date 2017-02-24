@@ -14,7 +14,7 @@ module.exports = () => {
         ext: Sequelize.STRING
     }, {
             freezeTableName: true,
-        });
+    });
 
     var CourtRoom = sequelize.define('CourtRoom', {
         id: {

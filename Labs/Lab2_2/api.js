@@ -8,17 +8,36 @@ const api = module.exports;
 // const participant = module.exports;
 // const cases = module.exports;
 
+// ----------------------------------//
+// ------ Cases ---------------------//
+// ----------------------------------//
 
 api.getAllCases=function(request,response){
     database.Case.findAll({})
-        .then(function(contacts) {
+        .then(function(cases) {
         var data = {
             error: "false",
-            data: contacts
+            data: cases
         };
         response.send(data);
     });
-}
+};
+
+api.getACase=function(request,response){
+    database.Case.findAll({
+         where: {
+             id: req.params.id
+	    }
+    })
+        .then(function(cases) {
+        var data = {
+            error: "false",
+            data: cases
+        };
+        response.send(data);
+    });
+};
+
 
 api.addCase=function(request,response){
     if (!error.verifyRequiredCase(request)){
@@ -40,7 +59,61 @@ api.addCase=function(request,response){
         };
         response.send(data);
     });
-}
+};
+
+api.updateCase=function (request,response) {
+    database.Case.find({
+    where: {
+      id: req.params.id
+        }
+    }).then(function (cases) {
+	if(cases){ 
+        cases.updateAttributes({
+        judge_id: request.query.judge_id,
+        courtroom_id: request.query.courtroom_id,
+        claimant_id: request.query.claimant_id,
+        respondent_id: request.query.respondent_id,
+        start_date: request.query.start_date,
+        duration: request.query.duration
+      }).then(function(cases) {
+        res.send(cases);
+      });
+    }
+  });
+};
+
+api.deleteCase=function(request,response) {
+    database.Case.destroy({
+    where: {
+      id: req.params.id
+        }
+    }).then(function(deleted) {
+        var data = {
+            message: "Case deleted sucesfully ",
+            data: deleted
+        };
+        res.send(data);
+    });
+};
+
+// ----------------------------------//
+// ------ CourtRoom -----------------//
+// ----------------------------------//
+
+
+api.getACourtRoom=function(request,response){
+    database.CourtRoom.findAll({
+         where: {
+             id: req.params.id
+	    }
+    }).then(function(courtRooms) {
+        var data = {
+            error: "false",
+            data: courtRooms
+        };
+        response.send(data);
+    });
+};
 
 api.getAllCourtRooms=function(request,response){
     database.CourtRoom.findAll({})
@@ -51,7 +124,21 @@ api.getAllCourtRooms=function(request,response){
         };
         response.send(data);
     });
-}
+};
+
+api.deleteCourtRoom=function(request,response) {
+    database.CourtRoom.destroy({
+    where: {
+      id: req.params.id
+        }
+    }).then(function(deleted) {
+        var data = {
+            message: "CourtRoom deleted sucesfully ",
+            data: deleted
+        };
+        res.send(data);
+    });
+};
 
 api.addCourtRoom=function(request,response){
     if (!error.verifyRequiredCourtRoom(request)){
@@ -68,7 +155,31 @@ api.addCourtRoom=function(request,response){
         };
         response.send(data);
     });
-}
+};
+
+api.updateCourtRoom=function (request,response) {
+    if (!error.verifyRequiredCourtRoom(request)){
+        response.send(422,error_messages);
+        return;
+    }
+    database.CourtRoom.find({
+    where: {
+      id: req.params.id
+        }
+    }).then(function (courtRooms) {
+	if(courtRooms){ 
+        courtRooms.updateAttributes({
+        number: request.query.number
+      }).then(function(courtRooms) {
+        res.send(courtRooms);
+      });
+    }
+  });
+};
+
+// ----------------------------------//
+// ------ Participant ---------------//
+// ----------------------------------//
 
 api.getAllParticipants=function(request,response){
     database.Participant.findAll({})
@@ -79,7 +190,7 @@ api.getAllParticipants=function(request,response){
         };
         response.send(data);
     });
-}
+};
 
 api.addParticipant=function(request,response){
     if (!error.verifyRequiredParticipant(request)){
@@ -98,7 +209,49 @@ api.addParticipant=function(request,response){
         };
         response.send(data);
     });
-}
+};
+
+api.updateParticipant=function (request,response) {
+    if (!error.verifyRequiredParticipant(request)){
+        response.send(422,error_messages);
+        return;
+    }
+    database.Participant.find({
+    where: {
+      id: req.params.id
+        }
+    }).then(function (participants) {
+	if(participants){ 
+        participants.updateAttributes({
+            name: request.query.name,
+            address: request.query.address,
+            type: request.query.type,
+      }).then(function(participants) {
+        res.send(participants);
+      });
+    }
+  });
+};
+
+api.deleteParticipant=function(request,response) {
+    database.Participant.destroy({
+    where: {
+      id: req.params.id
+        }
+    }).then(function(deleted) {
+        var data = {
+            message: "Participant deleted sucesfully ",
+            data: deleted
+        };
+        res.send(data);
+    });
+};
+
+
+
+// ----------------------------------//
+// ------ Judge ---------------------//
+// ----------------------------------//
 
 api.getAllJudges=function(request,response){
     database.Judge.findAll({})
@@ -109,7 +262,7 @@ api.getAllJudges=function(request,response){
         };
         response.send(data);
     });
-}
+};
 
 api.addJudge=function(request,response){
     if (!error.verifyRequiredJudge(request)){
@@ -129,4 +282,40 @@ api.addJudge=function(request,response){
         };
         response.send(data);
     });
-}
+};
+
+api.deleteJudge=function(request,response) {
+    database.Judge.destroy({
+    where: {
+      id: req.params.id
+        }
+    }).then(function(deleted) {
+        var data = {
+            message: "Judge deleted sucesfully ",
+            data: deleted
+        };
+        res.send(data);
+    });
+};
+
+api.updateJudge=function (request,response) {
+    if (!error.verifyRequiredJudge(request)){
+        response.send(422,error_messages);
+        return;
+    }
+    database.Judge.find({
+    where: {
+      id: req.params.id
+        }
+    }).then(function (judges) {
+	if(judges){ 
+        judges.updateAttributes({
+            name: request.query.name,
+            room: request.query.room,
+            ext: request.query.ext,
+      }).then(function(judges) {
+        res.send(judges);
+      });
+    }
+  });
+};
