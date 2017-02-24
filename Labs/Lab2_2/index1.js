@@ -1,17 +1,21 @@
 var express = require('express')
 var app = express()
 
-const database = require('./database')();
+//const database = require('./database')();
 const api = require('./api');
 const data = require('./data');
 
 
 app.get('/api/v1/judge', api.getAllJudges);
 app.post('/api/v1/judge', api.addJudge);
+app.put('/api/v1/judge',api.updateJudge);
+app.delete('/api/v1/judge',api.deleteJudge);
 
-app.get('/api/v1/case',api.addCase);
+app.get('/api/v1/case',api.getAllCases);
 app.get('/api/v1/case/:id',api.getACase);
-app.post('/api/v1/case', api.getAllCases);
+app.post('/api/v1/case', api.addCase);
+
+app.post('/case',api.getQCases);
 
 app.get('/api/v1/courtRoom', api.getAllCourtRooms);
 app.post('/api/v1/courtRoom', api.addCourtRoom);

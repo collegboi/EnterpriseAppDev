@@ -57,6 +57,22 @@ app.get('/products/safe/:title', function (req, res) {
 	});
 })
 
+app.get('/products/safe1/:title', function (req, res) {
+	var title = req.params.title;
+	db.run("select * from products where title = ?", title, function(err, result){
+		res.send(result);
+	});
+})
+
+// Using a stored procedure using SQL or PLPGSQL whichever you prefer
+app.get('/products/secure2/:title', function(req, res) {
+	var title = req.params.title; 
+
+	db.find_products([title], (error, result) => {
+	    res.send(result);
+	 });
+});
+
 app.listen(3000, function () {
 	console.log('Example app listening on port 3000!')
 })

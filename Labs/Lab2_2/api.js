@@ -2,6 +2,7 @@ var Sequelize = require('sequelize');
 var sequelize = new Sequelize('postgres://@localhost:5432/mydb');
 
 const error = require('./error');
+const database = require('./database')();
 const api = module.exports;
 // const courtRoom = module.exports;
 // const judge = module.exports;
@@ -22,6 +23,29 @@ api.getAllCases=function(request,response){
         response.send(data);
     });
 };
+
+api.getQCases=function(request,response){
+    database.Case.findAll({
+                where: {
+                            courtroom_id: request.query.courtroom_id,
+                            start_date : request.query.start_date
+                        }      
+    }).then(function(cases) {
+       if(cases.count >0) {
+            var data = {
+            error: "true",
+            data: cases};
+            response.send(data);
+        } else {
+            var data = {
+            error: "false",
+            data: cases.length
+        };
+            response.send(data);
+        }
+    });
+};
+
 
 api.getACase=function(request,response){
     database.Case.findAll({
@@ -44,7 +68,7 @@ api.addCase=function(request,response){
         response.send(422,error_messages);
         return;
     }
-    Case.create({
+    database.Case.create({
         judge_id: request.query.judge_id,
         courtroom_id: request.query.courtroom_id,
         claimant_id: request.query.claimant_id,
@@ -57,7 +81,7 @@ api.addCase=function(request,response){
             message: "New Case created successfully",
             data: contact
         };
-        response.send(data);
+        response.send(422,data);
     });
 };
 
@@ -145,7 +169,7 @@ api.addCourtRoom=function(request,response){
         response.send(422,error_messages);
         return;
     }
-    CourtRoom.create({
+    database.CourtRoom.create({
         number: request.query.number
     }).then(function(contact) {
         var data = {
@@ -197,7 +221,7 @@ api.addParticipant=function(request,response){
         response.send(422,error_messages);
         return;
     }
-    Participant.create({
+    database.Participant.create({
         name: request.query.name,
         address: request.query.address,
         type: request.query.type,
@@ -270,7 +294,7 @@ api.addJudge=function(request,response){
         return;
     }
 
-    Judge.create({
+    database.Judge.create({
         name: request.query.name,
         room: request.query.room,
         ext: request.query.ext,

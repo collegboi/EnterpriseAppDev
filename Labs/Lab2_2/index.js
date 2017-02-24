@@ -45,6 +45,17 @@ var Case = sequelize.define('Case', {
     },
 });
 
+var User = sequelize.define('User', {
+   id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    username: Sequelize.STRING,
+    birthday: Sequelize.DATE
+});
+
+
 
 sequelize.sync().then(function() {
   return User.create({

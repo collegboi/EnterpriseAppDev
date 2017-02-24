@@ -1,16 +1,16 @@
 const database = require('./database')();
 
 module.exports.verifyRequiredJudge =function(request){
-    var errors = true;
+    var errors = false;
 
-    if (request.query.name == "") {
-        errors = false;
+    if (request.query.name == null) {
+        errors = true;
     }
-    if (request.query.room == "") {
-        errors = false;
+    if (request.query.room == null) {
+        errors = true;
     }
-    if (request.query.ext == "") {
-        errors = false;
+    if (request.query.ext == null) {
+        errors = true;
     }
 
     if (errors) {
@@ -25,9 +25,9 @@ module.exports.verifyRequiredJudge =function(request){
 }
 
 module.exports.verifyRequiredCourtRoom =function(request){
-    var errors = true;
+    var errors = false;
 
-    if (request.query.number == "" ) {
+    if (request.query.number == null ) {
         errors = false;
     }
 
@@ -43,16 +43,16 @@ module.exports.verifyRequiredCourtRoom =function(request){
 }
 
 module.exports.verifyRequiredParticipant =function(request){
-    var errors = true;
+    var errors = false;
 
-    if (request.query.name == "" ) {
-        errors = false;
+    if (request.query.name == null) {
+        errors = true;
     }
-    if (request.query.address == "" ) {
-        errors = false;
+    if (request.query.address == null) {
+        errors = true;
     }
-    if (request.query.type == "" ) {
-        errors = false;
+    if (request.query.type == null) {
+        errors = true;
     }
 
     if (errors) {
@@ -67,31 +67,32 @@ module.exports.verifyRequiredParticipant =function(request){
 }
 
 module.exports.verifyRequiredCase =function(request){
-    var errors = true;
+    var errors = false;
 
-    if (request.query.courtroom_id == "" ) {
-        errors = false;
+    if (request.query.courtroom_id == null) {
+        errors = true;
     }
-    if (request.query.claimant_id == "" ) {
-        errors = false;
+    if (request.query.claimant_id == null) {
+        errors = true;
     }
-    if (request.query.respondent_id == "" ) {
-        errors = false;
+    if (request.query.respondent_id == null) {
+        errors = true;
     }
-    if (request.query.start_date == "" ) {
-        errors = false;
+    if (request.query.start_date == null) {
+        errors = true;
     }
-    if (request.query.duration == "" ) {
-        errors = false;
+    if (request.query.duration == null) {
+        errors = true;
     }
 
     database.Case.findAll({
                         where: {
-                            courtroom_id: request.query.courtroom_id
+                            courtroom_id: request.query.courtroom_id,
+                            start_date : request.query.start_date
                         }
-    }).then(function(contacts) {
-        if ( contacts.count > 0 ) {
-            errors = false
+    }).then(function(cases) {
+        if ( cases.length > 0 ) {
+            errors = true;
         }
     });
 
