@@ -1,0 +1,24 @@
+{
+  "development": {
+    "username": null,
+    "password": null,
+    "database": "developement",
+    "host": "127.0.0.1",
+    "port": "5432",
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": null,
+    "password": null,
+    "database": "test",
+    "host": "update me",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": null,
+    "password": null,
+    "database": "productioon",
+    "host": "update me",
+    "dialect": "postgres"
+  }
+}

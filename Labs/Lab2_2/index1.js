@@ -14,14 +14,20 @@ app.delete('/api/v1/judge',api.deleteJudge);
 app.get('/api/v1/case',api.getAllCases);
 app.get('/api/v1/case/:id',api.getACase);
 app.post('/api/v1/case', api.addCase);
+app.put('/api/v1/case',api.updateCase);
+app.delete('/api/v1/case',api.deleteCase);
 
 app.post('/case',api.getQCases);
 
 app.get('/api/v1/courtRoom', api.getAllCourtRooms);
 app.post('/api/v1/courtRoom', api.addCourtRoom);
+app.put('/api/v1/courtRoom',api.updateCourtRoom);
+app.delete('/api/v1/courtRoom',api.deleteCourtRoom);
 
 app.get('/api/v1/participant', api.getAllParticipants);
 app.post('/api/v1/participant', api.addParticipant);
+app.put('/api/v1/participant',api.updateParticipant);
+app.delete('/api/v1/participant',api.deleteParticipant);
 
 app.post('/api/v1/data',data.populate);
 
