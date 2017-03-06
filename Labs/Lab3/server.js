@@ -81,9 +81,7 @@ apiRoutes.post('/authenticate', function(req, res) {
           token: token
         });
       }   
-
     }
-
   });
 });
 
