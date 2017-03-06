@@ -1,10 +1,19 @@
 var express = require('express')
 var app = express()
 
+var jwt    = require('jsonwebtoken');
+
+var config = require('./config'); 
+
+app.set('superSecret', config.secret); 
+
 //const database = require('./database')();
 const api = require('./api');
 const data = require('./data');
 
+app.post('/api/v1/user', api.addUser);
+app.get('/api/v1/user', api.loginUser);
+app.put('/api/v1/user', api.updateUser);
 
 app.get('/api/v1/judge', api.getAllJudges);
 app.post('/api/v1/judge', api.addJudge);

@@ -1,5 +1,27 @@
 const database = require('./database')();
 
+module.exports.verifyRequiredUser =function(request){
+    var errors = false;
+
+    if (request.query.username == null ) {
+        errors = false;
+    }
+
+    if (request.query.password == null ) {
+        errors = false;
+    }
+
+    if (errors) {
+        error_messages = {
+            error: "true",
+            message : "query empty"
+        };
+        return false;
+    }else{
+        return true;
+    }
+}
+
 module.exports.verifyRequiredJudge =function(request){
     var errors = false;
 
@@ -86,10 +108,10 @@ module.exports.verifyRequiredCase =function(request){
     }
 
     database.Case.findAll({
-                        where: {
-                            courtroom_id: request.query.courtroom_id,
-                            start_date : request.query.start_date
-                        }
+                where: {
+                    courtroom_id: request.query.courtroom_id,
+                    start_date : request.query.start_date
+                }
     }).then(function(cases) {
         if ( cases.length > 0 ) {
             errors = true;

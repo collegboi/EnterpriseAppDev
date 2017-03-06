@@ -6,7 +6,13 @@ var Sequelize = require('sequelize');
 var basename  = path.basename(module.filename);
 var env       = process.env.NODE_ENV || 'development';
 var config    = require(__dirname + '/../config.json')[env];
-var db        = {};
+
+var cases = require(__dirname+ '/../model/case.js');
+var judges = require(__dirname+ '/../model/judges.js');
+var courtRoom = require(__dirname+ '/../model/courtRoom.js');
+var participant = require(__dirname+ '/../model/participant.js');
+
+var db        = {cases, judges, courtRoom,participant};
 
 if (config.use_env_variable) {
   var sequelize = new Sequelize(process.env[config.use_env_variable]);

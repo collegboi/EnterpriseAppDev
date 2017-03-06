@@ -10,6 +10,74 @@ const api = module.exports;
 // const cases = module.exports;
 
 // ----------------------------------//
+// ------ Users ---------------------//
+// ----------------------------------//
+
+api.addUser=function(request,response){
+    if (!error.verifyRequiredUser(request)){
+        response.send(422,error_messages);
+        return;
+    }
+
+    var username = request.query.username;
+    var password = request.query.password;
+
+    sequelize.query('INSERT INTO "User" (username, password) VALUES (? , crypt( ?, gen_salt(\'bf\', 8)))',
+        { replacements: [username,password], type: sequelize.QueryTypes.INSERT }
+    ).then(function(result) {
+        var data = {
+            error: "true",
+            message: "New User created successfully",
+            data: result
+        };
+        response.send(422,data);
+    })
+};
+
+api.loginUser=function(request,response){
+    if (!error.verifyRequiredUser(request)){
+        response.send(422,error_messages);
+        return;
+    }
+
+    var username = request.query.username;
+    var password = request.query.password;
+    
+    sequelize.query('SELECT * FROM "User" WHERE password is NOT NULL AND password = crypt(? , password) AND username = ? ',
+        { replacements: [password, username], type: sequelize.QueryTypes.SELECT }
+    ).then(function(result) {
+        var data = {
+            error: "true",
+            message: "User",
+            data: result
+        };
+        response.send(422,data);
+    })
+};
+
+api.updateUser=function(request,response){
+    if (!error.verifyRequiredUser(request)){
+        response.send(422,error_messages);
+        return;
+    }
+
+    var username = request.query.username;
+    var password = request.query.password;
+    
+    sequelize.query('UPDATE "User" SET password = crypt(?, gen_salt(\'bf\', 8)) WHERE username = ?',
+        { replacements: [password, username], type: sequelize.QueryTypes.SELECT }
+    ).then(function(result) {
+        var data = {
+            error: "true",
+            message: "User",
+            data: result
+        };
+        response.send(422,data);
+    })
+};
+
+
+// ----------------------------------//
 // ------ Cases ---------------------//
 // ----------------------------------//
 
@@ -26,15 +94,16 @@ api.getAllCases=function(request,response){
 
 api.getQCases=function(request,response){
     database.Case.findAll({
-                where: {
-                            courtroom_id: request.query.courtroom_id,
-                            start_date : request.query.start_date
-                        }      
+            where: {
+                courtroom_id: request.query.courtroom_id,
+                start_date : request.query.start_date
+            }      
     }).then(function(cases) {
        if(cases.count >0) {
             var data = {
             error: "true",
-            data: cases};
+            data: cases
+            };
             response.send(data);
         } else {
             var data = {
@@ -50,7 +119,7 @@ api.getQCases=function(request,response){
 api.getACase=function(request,response){
     database.Case.findAll({
          where: {
-             id: req.params.id
+             id: request.params.id
 	    }
     })
         .then(function(cases) {

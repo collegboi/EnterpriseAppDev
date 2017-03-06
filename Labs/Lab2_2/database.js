@@ -1,7 +1,31 @@
 var Sequelize = require('sequelize');
-var sequelize = new Sequelize('postgres://@localhost:5432/mydb');
+var config = require('./config'); 
+
+var sequelize = new Sequelize(config.database);
 
 module.exports = () => {
+
+     var User = sequelize.define('User', {
+        id: {
+            type: Sequelize.INTEGER,
+            primaryKey: true,
+            autoIncrement: true
+        },
+        username: Sequelize.STRING,
+        password: Sequelize.STRING,
+        salt: Sequelize.STRING,
+        admin: Boolean,
+        createdAt: {
+            type: Sequelize.DATE,
+            defaultValue: Sequelize.NOW
+        },
+         updatedAt: {
+            type: Sequelize.DATE,
+            defaultValue: Sequelize.NOW
+        }
+    }, {
+            freezeTableName: true,
+    });
 
     var Judge = sequelize.define('Judge', {
         id: {
@@ -56,6 +80,6 @@ module.exports = () => {
         });
 
     return {
-        Judge, CourtRoom, Participant, Case
+        Judge, CourtRoom, Participant, Case, User
     }
 }

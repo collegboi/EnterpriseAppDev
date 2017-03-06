@@ -2,6 +2,7 @@ const database = require('./database')();
 
 module.exports.populate =function(request, response){
 
+    database.User.sync();
     database.CourtRoom.sync();
     database.Judge.sync();
     database.Participant.sync();
