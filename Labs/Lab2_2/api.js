@@ -1,8 +1,10 @@
 var Sequelize = require('sequelize');
 var sequelize = new Sequelize('postgres://@localhost:5432/mydb');
-
+var config = require('./config');
 const error = require('./error');
 const database = require('./database')();
+var jwt    = require('jsonwebtoken');
+var stringify = require('json-stringify-safe');
 const api = module.exports;
 // const courtRoom = module.exports;
 // const judge = module.exports;
@@ -13,12 +15,65 @@ const api = module.exports;
 // ------ Users ---------------------//
 // ----------------------------------//
 
+
+api.registerUser=function(request,response){
+    
+    if (!error.verifyRequiredUser(request)){
+        response.send(422,error_messages);
+        return;
+    }
+    var username = request.body.name;
+    var password = request.body.password;
+
+    sequelize.query('INSERT INTO "User" (username, password) VALUES (? , crypt( ?, gen_salt(\'bf\', 8)))',
+        { replacements: [username,password], type: sequelize.QueryTypes.INSERT }
+    ).then(function(result) {
+        var data = {
+            error: "true",
+            message: "New User created successfully",
+            data: result
+        };
+        response.send(422,data);
+    })
+};
+
+api.authenticate=function(request, response) {
+    
+    var username = request.body.name; 
+    var password = request.body.password;
+
+    sequelize.query('SELECT * FROM "User" WHERE password is NOT NULL AND password = crypt(? , password) AND username = ? LIMIT 1 ',
+        { replacements: [password, username], type: sequelize.QueryTypes.SELECT }
+    ).then(function(user) {
+        
+        if( user[0] ) {
+            var userJSON = JSON.parse(stringify(user[0])); 
+            console.log(config.secret);
+		    console.log(userJSON);
+            
+            var token = jwt.sign(userJSON, config.secret, {
+                expiresIn : 60*60*24
+            });
+
+            // return the information including token as JSON
+            response.json({
+                success: true,
+                message: 'Enjoy your token!',
+                token: token
+            });
+
+        } else {
+            response.json({ success: false, message: 'Authentication failed. User not found.' });
+        }
+        
+    });
+}
+
 api.addUser=function(request,response){
     if (!error.verifyRequiredUser(request)){
         response.send(422,error_messages);
         return;
     }
-
     var username = request.query.username;
     var password = request.query.password;
 
@@ -56,13 +111,13 @@ api.loginUser=function(request,response){
 };
 
 api.updateUser=function(request,response){
-    if (!error.verifyRequiredUser(request)){
-        response.send(422,error_messages);
-        return;
-    }
+    // if (!error.verifyRequiredUser(request)){
+    //     response.send(422,error_messages);
+    //     return;
+    // }
 
-    var username = request.query.username;
-    var password = request.query.password;
+    var username = request.body.name;
+    var password = request.body.password;
     
     sequelize.query('UPDATE "User" SET password = crypt(?, gen_salt(\'bf\', 8)) WHERE username = ?',
         { replacements: [password, username], type: sequelize.QueryTypes.SELECT }

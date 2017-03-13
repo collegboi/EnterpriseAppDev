@@ -12,17 +12,7 @@ module.exports = () => {
             autoIncrement: true
         },
         username: Sequelize.STRING,
-        password: Sequelize.STRING,
-        salt: Sequelize.STRING,
-        admin: Boolean,
-        createdAt: {
-            type: Sequelize.DATE,
-            defaultValue: Sequelize.NOW
-        },
-         updatedAt: {
-            type: Sequelize.DATE,
-            defaultValue: Sequelize.NOW
-        }
+        password: Sequelize.STRING
     }, {
             freezeTableName: true,
     });
@@ -77,7 +67,7 @@ module.exports = () => {
         },
     }, {
             freezeTableName: true,
-        });
+    });
 
     return {
         Judge, CourtRoom, Participant, Case, User

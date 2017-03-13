@@ -1,44 +1,123 @@
 var express = require('express')
 var app = express()
-
+var bodyParser  = require('body-parser');
+var config = require('./config');
 var jwt    = require('jsonwebtoken');
+var stringify = require('json-stringify-safe');
 
-var config = require('./config'); 
+var http, url, crypto, sharedSecret;
+http = require("http");
+url = require("url");
+crypto = require("crypto");
+sharedSecret = "super-secret";
+
+const database = require('./database')();
 
 app.set('superSecret', config.secret); 
+app.set('appkey', config.appkey); 
 
-//const database = require('./database')();
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
 const api = require('./api');
 const data = require('./data');
 
-app.post('/api/v1/user', api.addUser);
-app.get('/api/v1/user', api.loginUser);
-app.put('/api/v1/user', api.updateUser);
+// app.use(require('apikey')(auth, 'my realm'));
+ 
+// function auth (key, fn) {
+//   if ('test' === key)
+//     fn(null, { id: '1', name: 'John Dorian'})
+//   else
+//     fn(null, null)
+// }
 
-app.get('/api/v1/judge', api.getAllJudges);
-app.post('/api/v1/judge', api.addJudge);
-app.put('/api/v1/judge',api.updateJudge);
-app.delete('/api/v1/judge',api.deleteJudge);
+var apiRoutes = express.Router(); 
 
-app.get('/api/v1/case',api.getAllCases);
-app.get('/api/v1/case/:id',api.getACase);
-app.post('/api/v1/case', api.addCase);
-app.put('/api/v1/case',api.updateCase);
-app.delete('/api/v1/case',api.deleteCase);
+apiRoutes.post('/register', api.registerUser);
+apiRoutes.post('/authenticate', api.authenticate);
 
-app.post('/case',api.getQCases);
 
-app.get('/api/v1/courtRoom', api.getAllCourtRooms);
-app.post('/api/v1/courtRoom', api.addCourtRoom);
-app.put('/api/v1/courtRoom',api.updateCourtRoom);
-app.delete('/api/v1/courtRoom',api.deleteCourtRoom);
+// route middleware to verify a token
+apiRoutes.use(function(req, res, next) {
 
-app.get('/api/v1/participant', api.getAllParticipants);
-app.post('/api/v1/participant', api.addParticipant);
-app.put('/api/v1/participant',api.updateParticipant);
-app.delete('/api/v1/participant',api.deleteParticipant);
+  var token = req.body.token || req.query.token || req.headers['x-access-token'];
+  // decode token
+  if (token) {
+    // verifies secret and checks exp
+    jwt.verify(token, app.get('superSecret'), function(err, decoded) {      
+      if (err) {
+        return res.json({ success: false, message: 'Failed to authenticate token.' });    
+      } else {
+		  console.log(req.baseUrl);
+		  // Get signature.
+        retrievedSignature = req.headers["x-signature"];
+     	// Recalculate signature.
+        parsedUrl = url.parse(req.url);
+        computedSignature = crypto.createHmac("sha256", sharedSecret).update(req.baseUrl).digest("hex");
+     	// Compare signatures.
+        if (computedSignature === retrievedSignature) {
+            // res.writeHead(200, {
+            //     "Content-Type": "text/plain"
+            // });
+            //req.decoded = decoded;    
+        	next();
+        } else {
+            res.writeHead(403, {
+                "Content-Type": "text/plain"
+            });
+            res.end("Get Out\n");
+        }
+      }
+    });
 
-app.post('/api/v1/data',data.populate);
+  } else {
+    return res.status(403).send({ 
+        success: false, 
+        message: 'No token provided.' 
+    });
+    
+  }
+});
+
+
+apiRoutes.post('/user', api.addUser);
+apiRoutes.get('/user', api.loginUser);
+apiRoutes.put('/user', api.updateUser);
+
+apiRoutes.get('/judge', api.getAllJudges);
+apiRoutes.post('/judge', api.addJudge);
+apiRoutes.put('/judge',api.updateJudge);
+apiRoutes.delete('/judge',api.deleteJudge);
+
+apiRoutes.get('/case',api.getAllCases);
+apiRoutes.get('/case/:id',api.getACase);
+apiRoutes.post('/case', api.addCase);
+apiRoutes.put('/case',api.updateCase);
+apiRoutes.delete('/case',api.deleteCase);
+
+apiRoutes.post('/case',api.getQCases);
+
+apiRoutes.get('/courtRoom', api.getAllCourtRooms);
+apiRoutes.post('/courtRoom', api.addCourtRoom);
+apiRoutes.put('/courtRoom',api.updateCourtRoom);
+apiRoutes.delete('/courtRoom',api.deleteCourtRoom);
+
+apiRoutes.get('/participant', api.getAllParticipants);
+apiRoutes.post('/participant', api.addParticipant);
+apiRoutes.put('/participant',api.updateParticipant);
+apiRoutes.delete('/participant',api.deleteParticipant);
+
+apiRoutes.post('/data',data.populate);
+
+// apiRoutes.get('/', function (req,res) {
+//   res.send('I can be reached only using an authorised api key.')
+// })
+
+
+// apply the routes to our application with the prefix /api
+app.use('/api/v1', apiRoutes);
+
+
 
 app.listen(3000, function () {
 	console.log('Example app listening on port 3000!')
